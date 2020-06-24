@@ -79,6 +79,8 @@ mod tests {
     #[test]
     fn it_works() {
         let t: TestType = "this is new type".into();
+        assert_eq!("this is new type", t.as_str());
+
         let s: String = t.into();
         assert_eq!("this is new type", s);
     }
