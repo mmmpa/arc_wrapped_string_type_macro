@@ -1,5 +1,5 @@
 #[macro_export]
-macro_rules! define_new_string_type {
+macro_rules! define_arc_wrapped_string_type {
     ( $($element:tt),* ) => { $(
 
         #[derive(Clone, Debug, PartialOrd, Ord, PartialEq, Eq, Hash, Deserialize, Serialize)]
@@ -72,7 +72,7 @@ mod tests {
     use std::sync::Arc;
     use serde::{Deserialize, Serialize};
 
-    define_new_string_type!(
+    define_arc_wrapped_string_type!(
         TestType
     );
 

@@ -1,5 +1,5 @@
 [package]
-name = "arc_wrapped_string_type_macro"
+name = "wrapped_string_type_macro"
 version = "0.1.0"
 authors = ["mmmpa <mmmpa.mmmpa@gmail.com>"]
 edition = "2018"
