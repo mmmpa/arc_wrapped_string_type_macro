@@ -1,0 +1,11 @@
+[package]
+name = "arc_wrapped_string_type_macro"
+version = "0.1.0"
+authors = ["mmmpa <mmmpa.mmmpa@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dev-dependencies]
+serde = { version = "^1.0.105", features = ["derive", "rc"] }
+serde_json = "1.0"
