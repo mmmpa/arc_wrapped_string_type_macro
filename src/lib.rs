@@ -59,6 +59,12 @@ macro_rules! define_arc_wrapped_string_type {
             }
         }
 
+        impl Default for $element {
+            fn default() -> Self {
+                Self::new("")
+            }
+        }
+
         impl $element {
             pub fn new(s: impl Into<$element>) -> Self {
                 s.into()
@@ -69,12 +75,10 @@ macro_rules! define_arc_wrapped_string_type {
 
 #[cfg(test)]
 mod tests {
-    use std::sync::Arc;
     use serde::{Deserialize, Serialize};
+    use std::sync::Arc;
 
-    define_arc_wrapped_string_type!(
-        TestType
-    );
+    define_arc_wrapped_string_type!(TestType);
 
     #[test]
     fn it_works() {
@@ -83,5 +87,9 @@ mod tests {
 
         let s: String = t.into();
         assert_eq!("this is new type", s);
+
+        let x: TestType = Default::default();
+        let y: TestType = Default::default();
+        assert_eq!(x, y);
     }
 }
