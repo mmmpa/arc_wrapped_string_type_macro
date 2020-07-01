@@ -9,6 +9,10 @@ macro_rules! define_arc_wrapped_string_type {
             pub fn as_str(&self) -> &str {
                 self.0.as_str()
             }
+
+            pub fn into_new_type<T: From<Arc<String>>>(self) -> T {
+                T::from(self.0)
+            }
         }
 
         impl AsRef<$element> for $element {
@@ -53,6 +57,12 @@ macro_rules! define_arc_wrapped_string_type {
             }
         }
 
+        impl Into<Arc<String>> for $element {
+            fn into(self) -> Arc<String> {
+                self.0
+            }
+        }
+
         impl Into<String> for &$element {
             fn into(self) -> String {
                 self.0.as_str().to_string()
@@ -78,7 +88,7 @@ mod tests {
     use serde::{Deserialize, Serialize};
     use std::sync::Arc;
 
-    define_arc_wrapped_string_type!(TestType);
+    define_arc_wrapped_string_type!(TestType, OtherType);
 
     #[test]
     fn it_works() {
@@ -91,5 +101,9 @@ mod tests {
         let x: TestType = Default::default();
         let y: TestType = Default::default();
         assert_eq!(x, y);
+
+        let m: TestType = "new type".into();
+        let n: OtherType = m.into_new_type();
+        assert_eq!("new type", n.as_str());
     }
 }
