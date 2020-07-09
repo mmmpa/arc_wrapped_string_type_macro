@@ -1,6 +1,6 @@
 #[macro_export]
 macro_rules! define_arc_wrapped_string_type {
-    ( $($element:tt),* ) => { $(
+    ( $($element:tt),* $(,)? ) => { $(
 
         #[derive(Clone, Debug, PartialOrd, Ord, PartialEq, Eq, Hash, Deserialize, Serialize)]
         pub struct $element(Arc<String>);
@@ -86,9 +86,10 @@ macro_rules! define_arc_wrapped_string_type {
 #[cfg(test)]
 mod tests {
     use serde::{Deserialize, Serialize};
+    use std::collections::HashMap;
     use std::sync::Arc;
 
-    define_arc_wrapped_string_type!(TestType, OtherType);
+    define_arc_wrapped_string_type!(TestType, OtherType,);
 
     #[test]
     fn it_works() {
@@ -105,5 +106,9 @@ mod tests {
         let m: TestType = "new type".into();
         let n: OtherType = m.into_new_type();
         assert_eq!("new type", n.as_str());
+
+        let mut h = HashMap::new();
+        let k: TestType = "new type".into();
+        h.insert(k, 123);
     }
 }
