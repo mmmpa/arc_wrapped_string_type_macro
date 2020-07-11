@@ -6,66 +6,20 @@ macro_rules! define_arc_wrapped_string_type {
         pub struct $element(Arc<String>);
 
         impl $element {
+            pub fn new(s: impl Into<$element>) -> Self {
+                s.into()
+            }
+
             pub fn as_str(&self) -> &str {
                 self.0.as_str()
             }
 
-            pub fn into_new_type<T: From<Arc<String>>>(self) -> T {
-                T::from(self.0)
-            }
-        }
-
-        impl AsRef<$element> for $element {
-            fn as_ref(&self) -> &$element {
-                self
-            }
-        }
-
-        impl From<Arc<String>> for $element {
-            fn from(s: Arc<String>) -> Self {
-                Self(s)
-            }
-        }
-
-        impl From<String> for $element {
-            fn from(s: String) -> Self {
-                Arc::new(s).into()
-            }
-        }
-
-        impl From<&str> for $element {
-            fn from(s: &str) -> Self {
-                s.to_string().into()
-            }
-        }
-
-        impl From<&String> for $element {
-            fn from(s: &String) -> Self {
-                s.to_string().into()
-            }
-        }
-
-        impl From<&$element> for $element {
-            fn from(s: &$element) -> Self {
-                s.0.clone().into()
-            }
-        }
-
-        impl Into<String> for $element {
-            fn into(self) -> String {
-                self.0.as_str().to_string()
-            }
-        }
-
-        impl Into<Arc<String>> for $element {
-            fn into(self) -> Arc<String> {
+            pub fn untype(self) -> Arc<String> {
                 self.0
             }
-        }
 
-        impl Into<String> for &$element {
-            fn into(self) -> String {
-                self.0.as_str().to_string()
+            pub fn into_new_type<T: From<Arc<String>>>(self) -> T {
+                T::from(self.0)
             }
         }
 
@@ -75,9 +29,31 @@ macro_rules! define_arc_wrapped_string_type {
             }
         }
 
-        impl $element {
-            pub fn new(s: impl Into<$element>) -> Self {
-                s.into()
+        impl AsRef<$element> for $element {
+            fn as_ref(&self) -> &$element {
+                self
+            }
+        }
+
+        // From
+
+        impl<T: ToString> From<T> for $element {
+            fn from(s: T) -> Self {
+                Self(Arc::new(s.to_string()))
+            }
+        }
+
+        // Into
+
+        impl Into<String> for $element {
+            fn into(self) -> String {
+                self.0.as_str().to_string()
+            }
+        }
+
+        impl Into<String> for &$element {
+            fn into(self) -> String {
+                self.0.as_str().to_string()
             }
         }
     )* };
@@ -110,5 +86,12 @@ mod tests {
         let mut h = HashMap::new();
         let k: TestType = "new type".into();
         h.insert(k, 123);
+    }
+
+    #[test]
+    fn test_from_types() {
+        TestType::from(11);
+        TestType::from("11");
+        TestType::from("11".to_string());
     }
 }
