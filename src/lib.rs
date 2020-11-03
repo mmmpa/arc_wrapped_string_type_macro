@@ -35,6 +35,12 @@ macro_rules! define_arc_wrapped_string_type {
             }
         }
 
+        impl AsRef<str> for $element {
+            fn as_ref(&self) -> &str {
+                &self.0
+            }
+        }
+
         // From
 
         impl<T: ToString> From<T> for $element {
