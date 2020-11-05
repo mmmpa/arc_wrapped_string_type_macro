@@ -1,3 +1,14 @@
+#[macro_use]
+extern crate lazy_static;
+
+pub mod prelude {
+    use std::sync::Arc;
+
+    lazy_static! {
+        pub static ref EMPTY: Arc<String> = Arc::new("".to_string());
+    }
+}
+
 #[macro_export]
 macro_rules! define_arc_wrapped_string_type {
     ( $($element:tt),* $(,)? ) => { $(
@@ -6,8 +17,17 @@ macro_rules! define_arc_wrapped_string_type {
         pub struct $element(Arc<String>);
 
         impl $element {
-            pub fn new(s: impl Into<$element>) -> Self {
-                s.into()
+            pub fn new(s: impl ToString) -> Self {
+                let s = s.to_string();
+                if s.is_empty() {
+                    Self::empty()
+                } else {
+                   Self(Arc::new(s))
+                }
+            }
+
+            pub fn empty() -> Self {
+                Default::default()
             }
 
             pub fn as_str(&self) -> &str {
@@ -25,7 +45,7 @@ macro_rules! define_arc_wrapped_string_type {
 
         impl Default for $element {
             fn default() -> Self {
-                Self::new("")
+              Self(EMPTY.clone())
             }
         }
 
@@ -45,7 +65,7 @@ macro_rules! define_arc_wrapped_string_type {
 
         impl<T: ToString> From<T> for $element {
             fn from(s: T) -> Self {
-                Self(Arc::new(s.to_string()))
+                Self::new(s)
             }
         }
 
@@ -67,6 +87,7 @@ macro_rules! define_arc_wrapped_string_type {
 
 #[cfg(test)]
 mod tests {
+    use crate::prelude::*;
     use serde::{Deserialize, Serialize};
     use std::collections::HashMap;
     use std::sync::Arc;
@@ -92,6 +113,13 @@ mod tests {
         let mut h = HashMap::new();
         let k: TestType = "new type".into();
         h.insert(k, 123);
+
+        let t1: TestType = Default::default();
+        let t2: TestType = Default::default();
+        let t3: TestType = TestType::new("");
+
+        assert_eq!(t1, t2);
+        assert_eq!(t2, t3);
     }
 
     #[test]
